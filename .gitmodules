@@ -1,0 +1,3 @@
+[submodule "sp_tool"]
+	path = sp_tool
+	url = https://github.com/MikhailStartsev/sp_tool.git

@@ -77,7 +77,8 @@ def run(args):
         labels_pred = np.argmax(predicted_labels, axis=-1)
         # We get outputs as windows of labels, so now need to assemble one whole sequence.
         # Also need to cut the result, since it contains only whole windows of data and was respectively mirror-padded
-        labels_pred = np.concatenate(labels_pred)[:original_obj['data'].shape[0]]
+        original_data = np.array(original_obj['data'])
+        labels_pred = np.concatenate(labels_pred)[:original_data.shape[0]]
 
         # Add a column containing predicted labels
         original_obj = ArffHelper.add_column(original_obj,
@@ -218,7 +219,7 @@ def get_corresponding_output_paths(subfolders_and_full_input_filenames, args):
 
 def get_features_columns(arff_obj, args):
     """
-    Extracting features from the .arff file (reading the file, getting the relevant columns
+    Extracting features from the .arff file (reading the file, getting the relevant columns)
     :param arff_obj: a loaded .arff file
     :param args: command line arguments
     :return:
@@ -233,14 +234,17 @@ def get_features_columns(arff_obj, args):
             print('Will divide by PPD the following features', keys_to_convert_to_degrees)
     get_features_columns.run_count += 1
 
+    # Extract the data from the arff_obj (this should give you the feature matrix)
+    data = np.array(arff_obj['data'])  # Make sure the data is in a NumPy array
+
     # normalize coordinates in @o by dividing by @ppd_f -- the pixels-per-degree value of the @arff_obj
     ppd_f = sp_util.calculate_ppd(arff_obj)
     for k in keys_to_convert_to_degrees:
-        arff_obj['data'][k] /= ppd_f
+        feature_idx = keys_to_keep.index(k)  # Get index of the feature
+        data[:, feature_idx] /= ppd_f  # Normalize the feature by the PPD value
 
-    # add to respective data sets (only the features to be used and the true labels)
-    return np.hstack([np.reshape(arff_obj['data'][key], (-1, 1)) for key in keys_to_keep]).astype(np.float64)
-
+    # Return the desired features
+    return np.hstack([np.reshape(data[:, keys_to_keep.index(key)], (-1, 1)) for key in keys_to_keep]).astype(np.float64)
 
 get_features_columns.run_count = 0
 

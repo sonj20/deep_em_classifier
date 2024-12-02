@@ -8,7 +8,7 @@ import json
 
 import keras
 from keras.models import Sequential
-from keras.layers import LSTM, Dense, Conv1D, TimeDistributed, Flatten, Activation, Dropout, Bidirectional
+from keras.layers import LSTM, Dense, Conv1D, TimeDistributed, Flatten, Activation, Dropout, Bidirectional,MaxPooling1D
 from keras.layers.pooling import MaxPooling1D
 from keras.callbacks import History, TensorBoard, Callback
 import keras.initializers as KI
